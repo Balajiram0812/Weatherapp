@@ -26,7 +26,7 @@ const AirConditionsItem = (props) => {
   return (
     <Grid
       item
-      xs={3}
+      xs={props.xs || 3}
       sx={{
         padding: '0',
         height: '80px',

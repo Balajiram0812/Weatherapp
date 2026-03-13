@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-import { Box, Container, Grid, Link, SvgIcon, Typography } from '@mui/material';
+import { Box, Container, Grid, SvgIcon, Typography } from '@mui/material';
 import Search from './components/Search/Search';
 import WeeklyForecast from './components/WeeklyForecast/WeeklyForecast';
 import TodayWeather from './components/TodayWeather/TodayWeather';
 import { fetchWeatherData } from './api/OpenWeatherService';
 import { transformDateFormat } from './utilities/DatetimeUtils';
-import UTCDatetime from './components/Reusable/UTCDatetime';
 import LoadingBox from './components/Reusable/LoadingBox';
 import { ReactComponent as SplashIcon } from './assets/splash-icon.svg';
-import Logo from './assets/logo.png';
 import ErrorBox from './components/Reusable/ErrorBox';
 import { ALL_DESCRIPTIONS } from './utilities/DateConstants';
-import GitHubIcon from '@mui/icons-material/GitHub';
 import {
   getTodayForecastWeather,
   getWeekForecastWeather,
@@ -23,6 +20,7 @@ function App() {
   const [weekForecast, setWeekForecast] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('Something went wrong');
 
   const searchChangeHandler = async (enteredData) => {
     const [latitude, longitude] = enteredData.value.split(' ');
@@ -53,8 +51,24 @@ function App() {
         city: enteredData.label,
         list: all_week_forecasts_list,
       });
+      
+      // Reset error state on successful fetch
+      setError(false);
+      setErrorMessage('Something went wrong');
     } catch (error) {
+      console.log(error);
       setError(true);
+      
+      // Handle specific error messages
+      if (error.message && error.message.includes('Invalid API key')) {
+        setErrorMessage(error.message);
+      } else if (error.message && error.message.includes('401')) {
+        setErrorMessage('API Authentication Failed: Please check your API keys in the configuration.');
+      } else if (error.message) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('Failed to fetch weather data. Please try again later.');
+      }
     }
 
     setIsLoading(false);
@@ -98,16 +112,14 @@ function App() {
 
   if (todayWeather && todayForecast && weekForecast) {
     appContent = (
-      <React.Fragment>
-        <Grid item xs={12} md={todayWeather ? 6 : 12}>
-          <Grid item xs={12}>
-            <TodayWeather data={todayWeather} forecastList={todayForecast} />
-          </Grid>
+      <Grid container sx={{ padding: '1rem 0rem 0rem' }}>
+        <Grid item xs={12} md={6}>
+          <TodayWeather data={todayWeather} forecastList={todayForecast} />
         </Grid>
         <Grid item xs={12} md={6}>
           <WeeklyForecast data={weekForecast} />
         </Grid>
-      </React.Fragment>
+      </Grid>
     );
   }
 
@@ -116,7 +128,7 @@ function App() {
       <ErrorBox
         margin="3rem auto"
         flex="inherit"
-        errorMessage="Something went wrong"
+        errorMessage={errorMessage}
       />
     );
   }
@@ -153,11 +165,11 @@ function App() {
   return (
     <Container
       sx={{
-        maxWidth: { xs: '95%', sm: '80%', md: '1100px' },
+        maxWidth: { xs: '95%', sm: '90%', md: '1300px' },
         width: '100%',
         height: '100%',
         margin: '0 auto',
-        padding: '1rem 0 3rem',
+        padding: '1rem 0 0',
         marginBottom: '1rem',
         borderRadius: {
           xs: 'none',
@@ -170,45 +182,36 @@ function App() {
       }}
     >
       <Grid container columnSpacing={2}>
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{ marginBottom: '1rem' }}>
           <Box
             display="flex"
+            flexDirection={{ xs: 'column', sm: 'row' }}
             justifyContent="space-between"
             alignItems="center"
-            sx={{
-              width: '100%',
-              marginBottom: '1rem',
-            }}
+            sx={{ width: '100%', gap: { xs: '15px', sm: '0' } }}
           >
-            <Box
-              component="img"
+            <Typography
+              variant="h4"
+              component="h1"
               sx={{
-                height: { xs: '16px', sm: '22px', md: '26px' },
-                width: 'auto',
+                fontSize: { xs: '18px', sm: '22px', md: '26px' },
+                color: 'rgba(255,255,255,.9)',
+                fontWeight: 700,
+                fontFamily: 'Roboto Condensed',
               }}
-              alt="logo"
-              src={Logo}
-            />
-
-            <UTCDatetime />
-            <Link
-              href="https://github.com/Amin-Awinti"
-              target="_blank"
-              underline="none"
-              sx={{ display: 'flex' }}
             >
-              <GitHubIcon
-                sx={{
-                  fontSize: { xs: '20px', sm: '22px', md: '26px' },
-                  color: 'white',
-                  '&:hover': { color: '#2d95bd' },
-                }}
-              />
-            </Link>
+              Weather Forecast
+            </Typography>
+
+            <Box sx={{ width: { xs: '100%', sm: '300px', md: '500px' } }}>
+              <Search onSearchChange={searchChangeHandler} />
+            </Box>
           </Box>
-          <Search onSearchChange={searchChangeHandler} />
         </Grid>
-        {appContent}
+
+        <Grid item xs={12}>
+          {appContent}
+        </Grid>
       </Grid>
     </Container>
   );

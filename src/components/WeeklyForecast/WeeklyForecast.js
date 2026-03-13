@@ -1,11 +1,6 @@
 import React from 'react';
-import { Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { getWeekDays } from '../../utilities/DatetimeUtils';
-import { weatherIcon } from '../../utilities/IconsUtils';
-import WeeklyForecastItem from './WeeklyForecastItem';
-import ErrorBox from '../Reusable/ErrorBox';
-import UnfedForecastItem from './UnfedForecastItem';
-import DayWeatherDetails from './DayWeatherDetails';
 import Layout from '../Reusable/Layout';
 
 const WeeklyForecast = ({ data }) => {
@@ -19,109 +14,86 @@ const WeeklyForecast = ({ data }) => {
 
   let content = (
     <div style={{ width: '100%' }}>
-      <ErrorBox type="error" />
+      <Typography
+        variant="body2"
+        sx={{
+          color: 'rgba(255,255,255,0.7)',
+          textAlign: 'center',
+          padding: '2rem 0',
+        }}
+      >
+        No forecast data available.
+      </Typography>
     </div>
   );
 
   if (!noDataProvided)
     content = (
-      <Grid
-        item
-        container
-        display="flex"
-        flexDirection="column"
-        xs={12}
-        gap="4px"
-      >
-        {data.list.map((item, idx) => {
-          return (
-            <Grid
-              item
-              key={idx}
-              xs={12}
-              display="flex"
-              alignItems="center"
-              sx={{
-                padding: '2px 0 2px',
-                background:
-                  'linear-gradient(0deg, rgba(255, 255, 255, .05) 0%, rgba(171, 203, 222, .05) 100%) 0% 0%',
-                boxShadow:
-                  'rgba(0, 0, 0, 0.05) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
-                borderRadius: '8px',
-              }}
-            >
-              <DayWeatherDetails
-                day={forecastDays[idx]}
-                src={weatherIcon(`${item.icon}`)}
-                description={item.description}
-              />
+      <Grid container item xs={12} sx={{ width: '100%' }}>
+        <Grid
+          item
+          xs={12}
+          sx={{
+            display: 'flex',
+            padding: '8px 12px',
+            borderBottom: '1px solid rgba(255,255,255,0.2)',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            fontSize: '12px',
+            color: 'rgba(255,255,255,0.7)',
+          }}
+        >
+          <Grid item xs={3}>
+            Day
+          </Grid>
+          <Grid item xs={3}>
+            Temp
+          </Grid>
+          <Grid item xs={3}>
+            Condition
+          </Grid>
+          <Grid item xs={3}>
+            Humidity
+          </Grid>
+        </Grid>
 
-              <Grid
-                container
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <WeeklyForecastItem
-                  type="temperature"
-                  value={Math.round(item.temp) + ' °C'}
-                  color="black"
-                />
-                <WeeklyForecastItem
-                  type="clouds"
-                  value={item.clouds + ' %'}
-                  color="black"
-                />
-              </Grid>
-
-              <Grid
-                container
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <WeeklyForecastItem
-                  type="wind"
-                  value={item.wind + ' m/s'}
-                  color="green"
-                />
-                <WeeklyForecastItem
-                  type="humidity"
-                  value={item.humidity + ' %'}
-                  color="green"
-                />
-              </Grid>
-            </Grid>
-          );
-        })}
-        {data.list.length === 5 && (
+        {data.list.map((item, idx) => (
           <Grid
             item
             xs={12}
-            display="flex"
-            alignItems="center"
+            key={idx}
             sx={{
-              padding: '2px 0 2px',
-              background:
-                'linear-gradient(0deg, rgba(255, 255, 255, .05) 0%, rgba(171, 203, 222, .05) 100%) 0% 0%',
-              boxShadow:
-                'rgba(0, 0, 0, 0.05) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px',
-              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '10px 12px',
+              borderBottom:
+                idx === data.list.length - 1
+                  ? 'none'
+                  : '1px solid rgba(255,255,255,0.1)',
             }}
           >
-            <UnfedForecastItem
-              day={forecastDays[5]}
-              value="NaN"
-              src={weatherIcon('unknown.png')}
-            />
+            <Grid item xs={3}>
+              <Typography sx={{ color: 'rgba(255,255,255,0.85)' }}>
+                {forecastDays[idx]}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography sx={{ color: 'rgba(255,255,255,0.85)' }}>
+                {Math.round(item.temp)} °C
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography sx={{ color: 'rgba(255,255,255,0.85)' }}>
+                {item.description}
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography sx={{ color: 'rgba(255,255,255,0.85)' }}>
+                {item.humidity} %
+              </Typography>
+            </Grid>
           </Grid>
-        )}
+        ))}
       </Grid>
     );
 
@@ -135,7 +107,7 @@ const WeeklyForecast = ({ data }) => {
         alignItems: 'center',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: '3rem 0 0',
+        padding: '1rem 0 0',
       }}
     />
   );

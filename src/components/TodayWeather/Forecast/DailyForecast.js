@@ -85,7 +85,7 @@ const DailyForecast = ({ data, forecastList }) => {
       title="TODAY'S FORECAST"
       content={content}
       sectionSubHeader={subHeader}
-      sx={{ marginTop: '2.9rem' }}
+      sx={{ marginTop: '1rem' }}
       mb="0.3rem"
     />
   );
